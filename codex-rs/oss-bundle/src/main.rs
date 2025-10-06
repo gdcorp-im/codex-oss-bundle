@@ -17,13 +17,8 @@ static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 /// Main entry point for codex-oss standalone binary
 #[tokio::main]
 async fn main() -> Result<()> {
-    // Initialize tracing
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info"))
-        )
-        .init();
+    // Don't initialize tracing here - the TUI will handle it
+    // Any logs before TUI starts will be suppressed to avoid polluting the terminal
 
     // Extract embedded Ollama binary
     let ollama_binary = embedded::ensure_ollama_extracted()

@@ -19,8 +19,6 @@ ctrlc = "3.4"
 dirs = { workspace = true }
 reqwest = { workspace = true, features = ["json"] }
 tokio = { workspace = true, features = ["full"] }
-tracing = { workspace = true }
-tracing-subscriber = { workspace = true, features = ["env-filter"] }
 
 # Use mimalloc on musl targets for better performance (musl's default allocator is slow)
 [target.'cfg(target_env = "musl")'.dependencies]
