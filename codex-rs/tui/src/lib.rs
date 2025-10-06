@@ -76,7 +76,7 @@ mod wrapping;
 #[cfg(test)]
 pub mod test_backend;
 
-#[cfg(all(not(debug_assertions), not(feature = "oss-bundle")))]
+#[cfg(not(debug_assertions))]
 mod updates;
 
 use crate::onboarding::TrustDirectorySelection;
@@ -299,8 +299,7 @@ async fn run_ratatui_app(
 
     // Show update banner in terminal history (instead of stderr) so it is visible
     // within the TUI scrollback. Building spans keeps styling consistent.
-    // Disabled for OSS bundle - we're not the upstream Codex project
-    #[cfg(all(not(debug_assertions), not(feature = "oss-bundle")))]
+    #[cfg(not(debug_assertions))]
     if let Some(latest_version) = updates::get_upgrade_version(&config) {
         use crate::history_cell::padded_emoji;
         use crate::history_cell::with_border_with_inner_width;

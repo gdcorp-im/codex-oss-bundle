@@ -53,6 +53,11 @@ struct ReleaseInfo {
 }
 
 const VERSION_FILENAME: &str = "version.json";
+
+#[cfg(feature = "oss-bundle")]
+const LATEST_RELEASE_URL: &str = "https://api.github.com/repos/gdcorp-im/codex-oss-bundle/releases/latest";
+
+#[cfg(not(feature = "oss-bundle"))]
 const LATEST_RELEASE_URL: &str = "https://api.github.com/repos/openai/codex/releases/latest";
 
 fn version_filepath(config: &Config) -> PathBuf {
@@ -75,9 +80,14 @@ async fn check_for_update(version_file: &Path) -> anyhow::Result<()> {
         .json::<ReleaseInfo>()
         .await?;
 
+    #[cfg(feature = "oss-bundle")]
+    let tag_prefix = "oss-v";
+    #[cfg(not(feature = "oss-bundle"))]
+    let tag_prefix = "rust-v";
+
     let info = VersionInfo {
         latest_version: latest_tag_name
-            .strip_prefix("rust-v")
+            .strip_prefix(tag_prefix)
             .ok_or_else(|| anyhow::anyhow!("Failed to parse latest tag name '{latest_tag_name}'"))?
             .into(),
         last_checked_at: Utc::now(),
