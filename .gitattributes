@@ -1,2 +1,12 @@
 # OSS bundle branch: always keep our README during merges/rebases
 README.md merge=ours
+
+# OSS bundle branch: disable upstream workflows, keep only ours
+.github/workflows/ci.yml merge=ours
+.github/workflows/cla.yml merge=ours
+.github/workflows/codespell.yml merge=ours
+.github/workflows/issue-deduplicator.yml merge=ours
+.github/workflows/issue-labeler.yml merge=ours
+.github/workflows/rust-ci.yml merge=ours
+.github/workflows/rust-release.yml merge=ours
+.github/workflows/sdk.yml merge=ours
