@@ -1,0 +1,2 @@
+# OSS bundle branch: always keep our README during merges/rebases
+README.md merge=ours
