@@ -1,0 +1,34 @@
+[package]
+edition = "2024"
+name = "codex-oss-bundle"
+version = { workspace = true }
+
+[[bin]]
+name = "codex-oss"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+codex-ollama = { workspace = true }
+codex-tui = { workspace = true }
+ctrlc = "3.4"
+dirs = { workspace = true }
+reqwest = { workspace = true, features = ["json"] }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+
+# Use mimalloc on musl targets for better performance (musl's default allocator is slow)
+[target.'cfg(target_env = "musl")'.dependencies]
+mimalloc = { version = "0.1", default-features = false }
+
+[build-dependencies]
+anyhow = { workspace = true }
+flate2 = { workspace = true }
+reqwest = { workspace = true, features = ["blocking"] }
+tar = { workspace = true }
+zip = { workspace = true }

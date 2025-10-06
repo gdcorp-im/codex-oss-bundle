@@ -1,0 +1,189 @@
+# Release workflow for codex-oss-bundle
+# To release: git tag -a oss-v0.1.0 -m "Release OSS Bundle 0.1.0" && git push origin oss-v0.1.0
+
+name: oss-bundle-release
+on:
+  push:
+    tags:
+      - "oss-v*.*.*"
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.runner }} - ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: codex-rs
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS builds (will be combined into universal binary)
+          - runner: macos-14
+            target: aarch64-apple-darwin
+            build_universal: true
+          - runner: macos-14
+            target: x86_64-apple-darwin
+            build_universal: false
+
+          # Linux x86_64
+          - runner: ubuntu-24.04
+            target: x86_64-unknown-linux-musl
+            build_universal: false
+          - runner: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            build_universal: false
+
+          # Linux ARM64
+          - runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+            build_universal: false
+          - runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            build_universal: false
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@1.90
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ${{ github.workspace }}/codex-rs/target/
+          key: cargo-oss-${{ matrix.runner }}-${{ matrix.target }}-release-${{ hashFiles('**/Cargo.lock') }}
+
+      - if: ${{ matrix.target == 'x86_64-unknown-linux-musl' || matrix.target == 'aarch64-unknown-linux-musl'}}
+        name: Install musl build tools
+        run: |
+          sudo apt install -y musl-tools pkg-config
+
+      - name: Build codex-oss-bundle
+        run: cargo build --target ${{ matrix.target }} --release -p codex-oss-bundle
+
+      - name: Stage artifacts
+        shell: bash
+        run: |
+          dest="dist/${{ matrix.target }}"
+          mkdir -p "$dest"
+          cp target/${{ matrix.target }}/release/codex-oss "$dest/codex-oss-${{ matrix.target }}"
+
+      # Create macOS universal binary (only on aarch64 build)
+      - if: ${{ matrix.build_universal }}
+        name: Build x86_64 for universal binary
+        run: |
+          rustup target add x86_64-apple-darwin
+          cargo build --target x86_64-apple-darwin --release -p codex-oss-bundle
+
+      - if: ${{ matrix.build_universal }}
+        name: Create universal binary
+        run: |
+          mkdir -p dist/universal-apple-darwin
+          lipo -create \
+            target/aarch64-apple-darwin/release/codex-oss \
+            target/x86_64-apple-darwin/release/codex-oss \
+            -output dist/universal-apple-darwin/codex-oss-universal-apple-darwin
+
+          # Verify
+          lipo -info dist/universal-apple-darwin/codex-oss-universal-apple-darwin
+          file dist/universal-apple-darwin/codex-oss-universal-apple-darwin
+
+      - name: Compress artifacts
+        shell: bash
+        run: |
+          # Compress per-target binary
+          dest="dist/${{ matrix.target }}"
+          if [[ -f "$dest/codex-oss-${{ matrix.target }}" ]]; then
+            tar -C "$dest" -czf "$dest/codex-oss-${{ matrix.target }}.tar.gz" "codex-oss-${{ matrix.target }}"
+            zstd -T0 -19 --rm "$dest/codex-oss-${{ matrix.target }}"
+          fi
+
+          # Compress universal binary if it exists
+          if [[ -f "dist/universal-apple-darwin/codex-oss-universal-apple-darwin" ]]; then
+            tar -C dist/universal-apple-darwin -czf dist/universal-apple-darwin/codex-oss-universal-apple-darwin.tar.gz "codex-oss-universal-apple-darwin"
+            zstd -T0 -19 --rm "dist/universal-apple-darwin/codex-oss-universal-apple-darwin"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: |
+            codex-rs/dist/${{ matrix.target }}/*
+
+      - if: ${{ matrix.build_universal }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: universal-apple-darwin
+          path: |
+            codex-rs/dist/universal-apple-darwin/*
+
+  release:
+    needs: build
+    name: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: List artifacts
+        run: ls -R dist/
+
+      - name: Define release name
+        id: release_name
+        run: |
+          version="${GITHUB_REF_NAME#oss-v}"
+          echo "name=${version}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "OSS Bundle ${{ steps.release_name.outputs.name }}"
+          tag_name: ${{ github.ref_name }}
+          body: |
+            # Codex OSS Bundle ${{ steps.release_name.outputs.name }}
+
+            Standalone, self-contained Codex binaries with embedded Ollama.
+
+            ## Downloads
+
+            ### macOS
+            - **Universal (Intel + Apple Silicon)**: `codex-oss-universal-apple-darwin.tar.gz`
+
+            ### Linux x86_64
+            - **glibc** (standard): `codex-oss-x86_64-unknown-linux-gnu.tar.gz`
+            - **musl** (static, more portable): `codex-oss-x86_64-unknown-linux-musl.tar.gz`
+
+            ### Linux ARM64
+            - **glibc** (standard): `codex-oss-aarch64-unknown-linux-gnu.tar.gz`
+            - **musl** (static, more portable): `codex-oss-aarch64-unknown-linux-musl.tar.gz`
+
+            ## Usage
+
+            1. Download and extract the binary for your platform
+            2. Run `./codex-oss`
+            3. On first run, the gpt-oss:20b model (~12GB) will be downloaded
+            4. Start coding!
+
+            No API keys or cloud services required. Everything runs locally.
+          files: dist/**
+          prerelease: ${{ contains(steps.release_name.outputs.name, '-') }}
