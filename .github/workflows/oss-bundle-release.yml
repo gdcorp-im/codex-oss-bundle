@@ -177,38 +177,47 @@ jobs:
           echo "name=${version}" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: "OSS Bundle ${{ steps.release_name.outputs.name }}"
-          tag_name: ${{ github.ref_name }}
-          body: |
-            # Codex OSS Bundle ${{ steps.release_name.outputs.name }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#oss-v}"
 
-            Standalone, self-contained Codex binaries with embedded Ollama.
+          # Check if this is a prerelease
+          prerelease_flag=""
+          if [[ "$version" == *-* ]]; then
+            prerelease_flag="--prerelease"
+          fi
 
-            ## Downloads
+          # Create release with body
+          gh release create "$GITHUB_REF_NAME" \
+            --title "OSS Bundle $version" \
+            $prerelease_flag \
+            --notes "# Codex OSS Bundle $version
 
-            ### macOS
-            - **Universal (Intel + Apple Silicon)**: `codex-oss-universal-apple-darwin.tar.gz`
+          Standalone, self-contained Codex binaries with embedded Ollama.
 
-            ### Linux x86_64
-            - **glibc** (standard): `codex-oss-x86_64-unknown-linux-gnu.tar.gz`
-            - **musl** (static, more portable): `codex-oss-x86_64-unknown-linux-musl.tar.gz`
+          ## Downloads
 
-            ### Linux ARM64
-            - **glibc** (standard): `codex-oss-aarch64-unknown-linux-gnu.tar.gz`
-            - **musl** (static, more portable): `codex-oss-aarch64-unknown-linux-musl.tar.gz`
+          ### macOS
+          - **Universal (Intel + Apple Silicon)**: \`codex-oss-universal-apple-darwin.tar.gz\`
 
-            ### Windows x86_64
-            - `codex-oss-x86_64-pc-windows-msvc.zip`
+          ### Linux x86_64
+          - **glibc** (standard): \`codex-oss-x86_64-unknown-linux-gnu.tar.gz\`
+          - **musl** (static, more portable): \`codex-oss-x86_64-unknown-linux-musl.tar.gz\`
 
-            ## Usage
+          ### Linux ARM64
+          - **glibc** (standard): \`codex-oss-aarch64-unknown-linux-gnu.tar.gz\`
+          - **musl** (static, more portable): \`codex-oss-aarch64-unknown-linux-musl.tar.gz\`
 
-            1. Download and extract the binary for your platform
-            2. Run `./codex-oss`
-            3. On first run, the gpt-oss:20b model (~12GB) will be downloaded
-            4. Start coding!
+          ### Windows x86_64
+          - \`codex-oss-x86_64-pc-windows-msvc.zip\`
 
-            No API keys or cloud services required. Everything runs locally.
-          files: dist/**
-          prerelease: ${{ contains(steps.release_name.outputs.name, '-') }}
+          ## Usage
+
+          1. Download and extract the binary for your platform
+          2. Run \`./codex-oss\`
+          3. On first run, the gpt-oss:20b model (~12GB) will be downloaded
+          4. Start coding!
+
+          No API keys or cloud services required. Everything runs locally." \
+            dist/**/*
