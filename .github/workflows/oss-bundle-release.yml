@@ -110,6 +110,44 @@ jobs:
           lipo -info dist/universal-apple-darwin/codex-oss-universal-apple-darwin
           file dist/universal-apple-darwin/codex-oss-universal-apple-darwin
 
+      - if: ${{ matrix.build_universal && secrets.MACOS_CERTIFICATE != '' }}
+        name: Code sign macOS binaries
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+          MACOS_KEYCHAIN_PWD: ${{ secrets.MACOS_KEYCHAIN_PWD }}
+        run: |
+          # Decode certificate
+          echo "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
+
+          # Create keychain
+          security create-keychain -p "$MACOS_KEYCHAIN_PWD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$MACOS_KEYCHAIN_PWD" build.keychain
+
+          # Import certificate
+          security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_KEYCHAIN_PWD" build.keychain
+
+          # Sign binaries
+          codesign --force --sign "Developer ID Application" \
+            --options runtime \
+            --timestamp \
+            dist/universal-apple-darwin/codex-oss-universal-apple-darwin
+
+          codesign --force --sign "Developer ID Application" \
+            --options runtime \
+            --timestamp \
+            dist/aarch64-apple-darwin/codex-oss-aarch64-apple-darwin
+
+          # Verify signatures
+          codesign --verify --verbose dist/universal-apple-darwin/codex-oss-universal-apple-darwin
+          codesign --verify --verbose dist/aarch64-apple-darwin/codex-oss-aarch64-apple-darwin
+
+          # Clean up
+          rm certificate.p12
+          security delete-keychain build.keychain
+
       - name: Compress artifacts
         shell: bash
         run: |
