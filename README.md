@@ -28,7 +28,22 @@ Download the binary for your platform from the [latest release](https://github.c
 
 ### 2. Install
 
-**macOS/Linux:**
+**macOS:**
+```bash
+# Extract the archive
+tar -xzf codex-oss-*.tar.gz
+
+# Move to a directory in your PATH
+sudo mv codex-oss-* /usr/local/bin/codex-oss
+
+# Make executable
+chmod +x /usr/local/bin/codex-oss
+
+# Remove quarantine attribute (required on macOS)
+xattr -d com.apple.quarantine /usr/local/bin/codex-oss
+```
+
+**Linux:**
 ```bash
 # Extract the archive
 tar -xzf codex-oss-*.tar.gz
@@ -118,6 +133,12 @@ rm -rf ~/.codex-oss/
 ```
 
 ## Troubleshooting
+
+### macOS: "Apple could not verify codex-oss is free of malware"
+Run this command to remove the quarantine flag:
+```bash
+xattr -d com.apple.quarantine /usr/local/bin/codex-oss
+```
 
 ### "Ollama server failed to start"
 - Check that port 8000-9000 range is available
