@@ -10,3 +10,6 @@ README.md merge=ours
 .github/workflows/rust-ci.yml merge=ours
 .github/workflows/rust-release.yml merge=ours
 .github/workflows/sdk.yml merge=ours
+
+# Remove OpenAI PR template
+.github/pull_request_template.md merge=ours
