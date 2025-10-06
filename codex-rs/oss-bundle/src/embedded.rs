@@ -35,11 +35,9 @@ pub fn ensure_ollama_extracted() -> Result<PathBuf> {
     if binary_path.exists() {
         if let Ok(metadata) = fs::metadata(&binary_path) {
             if metadata.len() == OLLAMA_BINARY.len() as u64 {
-                tracing::debug!("Ollama binary already extracted at {:?}", binary_path);
                 return Ok(binary_path);
             }
         }
-        tracing::info!("Ollama binary exists but size mismatch, re-extracting");
     }
 
     // Create parent directory
@@ -49,7 +47,6 @@ pub fn ensure_ollama_extracted() -> Result<PathBuf> {
     }
 
     // Write the binary
-    tracing::info!("Extracting Ollama binary to {:?}", binary_path);
     let mut file = fs::File::create(&binary_path)
         .with_context(|| format!("Failed to create file {:?}", binary_path))?;
     file.write_all(OLLAMA_BINARY)
@@ -62,7 +59,6 @@ pub fn ensure_ollama_extracted() -> Result<PathBuf> {
         let mut perms = fs::metadata(&binary_path)?.permissions();
         perms.set_mode(0o755);
         fs::set_permissions(&binary_path, perms)?;
-        tracing::debug!("Set executable permissions on Ollama binary");
     }
 
     Ok(binary_path)
