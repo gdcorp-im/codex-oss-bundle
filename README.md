@@ -10,21 +10,21 @@ Codex OSS is a standalone version of Codex that runs entirely on your local mach
 
 ### 1. Download
 
-Download the binary for your platform from the [latest release](https://github.com/jgowdy-godaddy/codex/releases):
+Download the binary for your platform from the [latest release](https://github.com/gdcorp-im/codex-oss-bundle/releases):
 
 **macOS:**
-- [codex-oss-universal-apple-darwin.tar.gz](https://github.com/jgowdy-godaddy/codex/releases/latest) (Intel + Apple Silicon)
+- [codex-oss-universal-apple-darwin.tar.gz](https://github.com/gdcorp-im/codex-oss-bundle/releases/latest) (Intel + Apple Silicon)
 
 **Linux x86_64:**
-- [codex-oss-x86_64-unknown-linux-musl.tar.gz](https://github.com/jgowdy-godaddy/codex/releases/latest) (recommended - static binary)
-- [codex-oss-x86_64-unknown-linux-gnu.tar.gz](https://github.com/jgowdy-godaddy/codex/releases/latest) (glibc)
+- [codex-oss-x86_64-unknown-linux-musl.tar.gz](https://github.com/gdcorp-im/codex-oss-bundle/releases/latest) (recommended - static binary)
+- [codex-oss-x86_64-unknown-linux-gnu.tar.gz](https://github.com/gdcorp-im/codex-oss-bundle/releases/latest) (glibc)
 
 **Linux ARM64:**
-- [codex-oss-aarch64-unknown-linux-musl.tar.gz](https://github.com/jgowdy-godaddy/codex/releases/latest) (recommended - static binary)
-- [codex-oss-aarch64-unknown-linux-gnu.tar.gz](https://github.com/jgowdy-godaddy/codex/releases/latest) (glibc)
+- [codex-oss-aarch64-unknown-linux-musl.tar.gz](https://github.com/gdcorp-im/codex-oss-bundle/releases/latest) (recommended - static binary)
+- [codex-oss-aarch64-unknown-linux-gnu.tar.gz](https://github.com/gdcorp-im/codex-oss-bundle/releases/latest) (glibc)
 
 **Windows x86_64:**
-- [codex-oss-x86_64-pc-windows-msvc.zip](https://github.com/jgowdy-godaddy/codex/releases/latest)
+- [codex-oss-x86_64-pc-windows-msvc.zip](https://github.com/gdcorp-im/codex-oss-bundle/releases/latest)
 
 ### 2. Install
 
@@ -155,8 +155,7 @@ Apache-2.0 (see LICENSE file)
 
 ## Support
 
-- Report issues: https://github.com/jgowdy-godaddy/codex/issues
-- Documentation: https://docs.claude.com/en/docs/claude-code
+- Report issues: https://github.com/gdcorp-im/codex-oss-bundle/issues
 
 ---
 
