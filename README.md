@@ -1,104 +1,152 @@
-<p align="center"><code>npm i -g @openai/codex</code><br />or <code>brew install codex</code></p>
+# Codex OSS - Standalone AI Code Assistant
 
-<p align="center"><strong>Codex CLI</strong> is a coding agent from OpenAI that runs locally on your computer.
-</br>
-</br>If you want Codex in your code editor (VS Code, Cursor, Windsurf), <a href="https://developers.openai.com/codex/ide">install in your IDE</a>
-</br>If you are looking for the <em>cloud-based agent</em> from OpenAI, <strong>Codex Web</strong>, go to <a href="https://chatgpt.com/codex">chatgpt.com/codex</a></p>
+A completely free, offline AI coding assistant with no API keys or cloud services required.
 
-<p align="center">
-  <img src="./.github/codex-cli-splash.png" alt="Codex CLI splash" width="80%" />
-  </p>
+## What is Codex OSS?
 
----
+Codex OSS is a standalone version of Codex that runs entirely on your local machine using open-source AI models. Everything runs locally - your code never leaves your computer.
 
-## Quickstart
+## Quick Start
 
-### Installing and running Codex CLI
+### 1. Download
 
-Install globally with your preferred package manager. If you use npm:
+Download the binary for your platform from the [latest release](https://github.com/jgowdy-godaddy/codex/releases):
 
-```shell
-npm install -g @openai/codex
+**macOS:**
+- [codex-oss-universal-apple-darwin.tar.gz](https://github.com/jgowdy-godaddy/codex/releases/latest) (Intel + Apple Silicon)
+
+**Linux x86_64:**
+- [codex-oss-x86_64-unknown-linux-musl.tar.gz](https://github.com/jgowdy-godaddy/codex/releases/latest) (recommended - static binary)
+- [codex-oss-x86_64-unknown-linux-gnu.tar.gz](https://github.com/jgowdy-godaddy/codex/releases/latest) (glibc)
+
+**Linux ARM64:**
+- [codex-oss-aarch64-unknown-linux-musl.tar.gz](https://github.com/jgowdy-godaddy/codex/releases/latest) (recommended - static binary)
+- [codex-oss-aarch64-unknown-linux-gnu.tar.gz](https://github.com/jgowdy-godaddy/codex/releases/latest) (glibc)
+
+### 2. Install
+
+```bash
+# Extract the archive
+tar -xzf codex-oss-*.tar.gz
+
+# Move to a directory in your PATH
+sudo mv codex-oss-* /usr/local/bin/codex-oss
+
+# Make executable (Linux/macOS)
+chmod +x /usr/local/bin/codex-oss
 ```
 
-Alternatively, if you use Homebrew:
+### 3. Run
 
-```shell
-brew install codex
+```bash
+codex-oss
 ```
 
-Then simply run `codex` to get started:
+On first run:
+- The embedded Ollama server will start automatically
+- The AI model (~12GB) will download (one-time only)
+- Once complete, you can start coding!
 
-```shell
-codex
+## Features
+
+✅ **Completely Free** - No API keys, no subscriptions, no usage fees
+✅ **100% Offline** - Runs entirely on your machine after initial model download
+✅ **Private** - Your code never leaves your computer
+✅ **No Setup** - Single binary with everything embedded
+✅ **Cross-Platform** - Works on macOS, Linux x86_64, and Linux ARM64
+
+## System Requirements
+
+- **RAM**: 16GB minimum (20GB recommended)
+- **Disk**: 15GB free space for model storage
+- **OS**: macOS 10.15+, Linux (kernel 3.2+)
+
+## Usage Examples
+
+Start an interactive session:
+```bash
+codex-oss
 ```
 
-<details>
-<summary>You can also go to the <a href="https://github.com/openai/codex/releases/latest">latest GitHub Release</a> and download the appropriate binary for your platform.</summary>
+Use a specific model (120B instead of default 20B):
+```bash
+codex-oss -m gpt-oss:120b
+```
 
-Each GitHub Release contains many executables, but in practice, you likely want one of these:
+Start with a prompt:
+```bash
+codex-oss "Create a Python web scraper"
+```
 
-- macOS
-  - Apple Silicon/arm64: `codex-aarch64-apple-darwin.tar.gz`
-  - x86_64 (older Mac hardware): `codex-x86_64-apple-darwin.tar.gz`
-- Linux
-  - x86_64: `codex-x86_64-unknown-linux-musl.tar.gz`
-  - arm64: `codex-aarch64-unknown-linux-musl.tar.gz`
+## Model Options
 
-Each archive contains a single entry with the platform baked into the name (e.g., `codex-x86_64-unknown-linux-musl`), so you likely want to rename it to `codex` after extracting it.
+- **gpt-oss:20b** (default): Faster, 12GB download, requires 16GB RAM
+- **gpt-oss:120b**: More capable, 70GB download, requires 80GB RAM
 
-</details>
+## How It Works
 
-### Using Codex with your ChatGPT plan
+Codex OSS bundles:
+1. **The Codex CLI** - Full Codex functionality
+2. **Ollama** - Local AI model server (embedded)
+3. **GPT-OSS Models** - Open-source language models
 
-<p align="center">
-  <img src="./.github/codex-cli-login.png" alt="Codex CLI login" width="80%" />
-  </p>
+When you run `codex-oss`, it:
+1. Extracts Ollama to `~/.codex-oss/bin/`
+2. Starts Ollama server on an available port
+3. Downloads the AI model (first run only)
+4. Launches the Codex interactive interface
 
-Run `codex` and select **Sign in with ChatGPT**. We recommend signing into your ChatGPT account to use Codex as part of your Plus, Pro, Team, Edu, or Enterprise plan. [Learn more about what's included in your ChatGPT plan](https://help.openai.com/en/articles/11369540-codex-in-chatgpt).
+## Uninstall
 
-You can also use Codex with an API key, but this requires [additional setup](./docs/authentication.md#usage-based-billing-alternative-use-an-openai-api-key). If you previously used an API key for usage-based billing, see the [migration steps](./docs/authentication.md#migrating-from-usage-based-billing-api-key). If you're having trouble with login, please comment on [this issue](https://github.com/openai/codex/issues/1243).
+```bash
+# Remove the binary
+sudo rm /usr/local/bin/codex-oss
 
-### Model Context Protocol (MCP)
+# Remove downloaded models (optional - frees ~15GB)
+rm -rf ~/.codex-oss/
+```
 
-Codex CLI supports [MCP servers](./docs/advanced.md#model-context-protocol-mcp). Enable by adding an `mcp_servers` section to your `~/.codex/config.toml`.
+## Troubleshooting
 
-### Configuration
+### "Ollama server failed to start"
+- Check that port 8000-9000 range is available
+- Ensure you have at least 16GB RAM
 
-Codex CLI supports a rich set of configuration options, with preferences stored in `~/.codex/config.toml`. For full configuration options, see [Configuration](./docs/config.md).
+### Model download is slow
+- First download can take 20-60 minutes depending on connection
+- Downloads are cached - subsequent runs are instant
 
----
+### Out of memory errors
+- Close other applications
+- Try the 20B model instead of 120B
+- Ensure you have at least 16GB RAM
 
-### Docs & FAQ
+## FAQ
 
-- [**Getting started**](./docs/getting-started.md)
-  - [CLI usage](./docs/getting-started.md#cli-usage)
-  - [Running with a prompt as input](./docs/getting-started.md#running-with-a-prompt-as-input)
-  - [Example prompts](./docs/getting-started.md#example-prompts)
-  - [Memory with AGENTS.md](./docs/getting-started.md#memory-with-agentsmd)
-  - [Configuration](./docs/config.md)
-- [**Sandbox & approvals**](./docs/sandbox.md)
-- [**Authentication**](./docs/authentication.md)
-  - [Auth methods](./docs/authentication.md#forcing-a-specific-auth-method-advanced)
-  - [Login on a "Headless" machine](./docs/authentication.md#connecting-on-a-headless-machine)
-- **Automating Codex**
-  - [GitHub Action](https://github.com/openai/codex-action)
-  - [TypeScript SDK](./sdk/typescript/README.md)
-  - [Non-interactive mode (`codex exec`)](./docs/exec.md)
-- [**Advanced**](./docs/advanced.md)
-  - [Tracing / verbose logging](./docs/advanced.md#tracing--verbose-logging)
-  - [Model Context Protocol (MCP)](./docs/advanced.md#model-context-protocol-mcp)
-- [**Zero data retention (ZDR)**](./docs/zdr.md)
-- [**Contributing**](./docs/contributing.md)
-- [**Install & build**](./docs/install.md)
-  - [System Requirements](./docs/install.md#system-requirements)
-  - [DotSlash](./docs/install.md#dotslash)
-  - [Build from source](./docs/install.md#build-from-source)
-- [**FAQ**](./docs/faq.md)
-- [**Open source fund**](./docs/open-source-fund.md)
+**Q: Is this really free?**
+A: Yes, completely free with no hidden costs.
 
----
+**Q: Does this work offline?**
+A: Yes, after the initial model download.
+
+**Q: How does it compare to ChatGPT/Claude?**
+A: The 20B model is comparable to GPT-3.5, the 120B is closer to GPT-4 quality.
+
+**Q: Can I use this commercially?**
+A: Check the Apache-2.0 license for details. The models have their own licenses.
+
+**Q: Is this affiliated with OpenAI?**
+A: No, this is an independent project using open-source models.
 
 ## License
 
-This repository is licensed under the [Apache-2.0 License](LICENSE).
+Apache-2.0 (see LICENSE file)
+
+## Support
+
+- Report issues: https://github.com/jgowdy-godaddy/codex/issues
+- Documentation: https://docs.claude.com/en/docs/claude-code
+
+---
+
+Made with ❤️ for the open source community
