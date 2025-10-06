@@ -247,7 +247,7 @@ impl ModelProviderInfo {
     }
 }
 
-const DEFAULT_OLLAMA_PORT: u32 = 11434;
+const DEFAULT_GPT_OSS_PORT: u32 = 8000;
 
 pub const BUILT_IN_OSS_MODEL_PROVIDER_ID: &str = "oss";
 
@@ -320,7 +320,7 @@ pub fn create_oss_provider() -> ModelProviderInfo {
                 .ok()
                 .filter(|v| !v.trim().is_empty())
                 .and_then(|v| v.parse::<u32>().ok())
-                .unwrap_or(DEFAULT_OLLAMA_PORT)
+                .unwrap_or(DEFAULT_GPT_OSS_PORT)
         ),
     };
 
@@ -333,7 +333,7 @@ pub fn create_oss_provider_with_base_url(base_url: &str) -> ModelProviderInfo {
         base_url: Some(base_url.into()),
         env_key: None,
         env_key_instructions: None,
-        wire_api: WireApi::Chat,
+        wire_api: WireApi::Responses,
         query_params: None,
         http_headers: None,
         env_http_headers: None,

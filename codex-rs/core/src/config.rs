@@ -928,9 +928,9 @@ impl Config {
         let sandbox_policy = cfg.derive_sandbox_policy(sandbox_mode);
 
         let mut model_providers = built_in_model_providers();
-        // Merge user-defined providers into the built-in list.
+        // Merge user-defined providers into the built-in list, allowing overrides.
         for (key, provider) in cfg.model_providers.into_iter() {
-            model_providers.entry(key).or_insert(provider);
+            model_providers.insert(key, provider);
         }
 
         let model_provider_id = model_provider
@@ -994,6 +994,7 @@ impl Config {
         }
 
         let openai_model_info = get_model_info(&model_family);
+        let default_reasoning_effort = model_family.default_reasoning_effort;
         let model_context_window = cfg
             .model_context_window
             .or_else(|| openai_model_info.as_ref().map(|info| info.context_window));
@@ -1071,7 +1072,8 @@ impl Config {
                 .unwrap_or(false),
             model_reasoning_effort: config_profile
                 .model_reasoning_effort
-                .or(cfg.model_reasoning_effort),
+                .or(cfg.model_reasoning_effort)
+                .or(default_reasoning_effort),
             model_reasoning_summary: config_profile
                 .model_reasoning_summary
                 .or(cfg.model_reasoning_summary)

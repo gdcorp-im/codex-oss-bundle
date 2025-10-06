@@ -1,5 +1,8 @@
 use crate::config_types::ReasoningSummaryFormat;
+use crate::gpt_oss::GptOssVariant;
+use crate::gpt_oss::{self};
 use crate::tools::handlers::apply_patch::ApplyPatchToolType;
+use codex_protocol::config_types::ReasoningEffort as ReasoningEffortConfig;
 
 /// The `instructions` field in the payload sent to a model should always start
 /// with this content.
@@ -7,7 +10,7 @@ const BASE_INSTRUCTIONS: &str = include_str!("../prompt.md");
 const GPT_5_CODEX_INSTRUCTIONS: &str = include_str!("../gpt_5_codex_prompt.md");
 
 /// A model family is a group of models that share certain characteristics.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ModelFamily {
     /// The full model slug used to derive this model family, e.g.
     /// "gpt-4.1-2025-04-14".
@@ -39,6 +42,12 @@ pub struct ModelFamily {
     /// a tool call instead of just a bash command
     pub apply_patch_tool_type: Option<ApplyPatchToolType>,
 
+    /// Optional default reasoning effort to apply when the user has not set one.
+    pub default_reasoning_effort: Option<ReasoningEffortConfig>,
+
+    /// When set, identifies which gpt-oss variant this family represents.
+    pub gpt_oss_variant: Option<GptOssVariant>,
+
     // Instructions to use for querying the model
     pub base_instructions: String,
 
@@ -59,6 +68,8 @@ macro_rules! model_family {
             reasoning_summary_format: ReasoningSummaryFormat::None,
             uses_local_shell_tool: false,
             apply_patch_tool_type: None,
+            default_reasoning_effort: None,
+            gpt_oss_variant: None,
             base_instructions: BASE_INSTRUCTIONS.to_string(),
             experimental_supported_tools: Vec::new(),
         };
@@ -97,6 +108,17 @@ pub fn find_family_for_model(slug: &str) -> Option<ModelFamily> {
             slug, "gpt-4.1",
             needs_special_apply_patch_instructions: true,
         )
+    } else if let Some(variant) = gpt_oss::detect_variant(slug) {
+        let appendix = variant.developer_appendix();
+        let base_instructions = format!("{}\n{}", BASE_INSTRUCTIONS, appendix.trim());
+        model_family!(
+            slug, variant.canonical_family(),
+            apply_patch_tool_type: Some(ApplyPatchToolType::Function),
+            supports_reasoning_summaries: matches!(variant, GptOssVariant::V120B),
+            default_reasoning_effort: Some(variant.default_reasoning_effort()),
+            gpt_oss_variant: Some(variant),
+            base_instructions: base_instructions,
+        )
     } else if slug.starts_with("gpt-oss") || slug.starts_with("openai/gpt-oss") {
         model_family!(slug, "gpt-oss", apply_patch_tool_type: Some(ApplyPatchToolType::Function))
     } else if slug.starts_with("gpt-4o") {
@@ -131,6 +153,8 @@ pub fn derive_default_model_family(model: &str) -> ModelFamily {
         reasoning_summary_format: ReasoningSummaryFormat::None,
         uses_local_shell_tool: false,
         apply_patch_tool_type: None,
+        default_reasoning_effort: None,
+        gpt_oss_variant: None,
         base_instructions: BASE_INSTRUCTIONS.to_string(),
         experimental_supported_tools: Vec::new(),
     }

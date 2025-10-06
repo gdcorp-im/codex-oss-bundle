@@ -4,6 +4,7 @@ mod pull;
 mod url;
 
 pub use client::OllamaClient;
+use codex_core::WireApi;
 use codex_core::config::Config;
 pub use pull::CliProgressReporter;
 pub use pull::PullEvent;
@@ -20,6 +21,10 @@ pub const DEFAULT_OSS_MODEL: &str = "gpt-oss:20b";
 pub async fn ensure_oss_ready(config: &Config) -> std::io::Result<()> {
     // Only download when the requested model is the default OSS model (or when -m is not provided).
     let model = config.model.as_ref();
+
+    if config.model_provider.wire_api != WireApi::Chat {
+        return Ok(());
+    }
 
     // Verify local Ollama is reachable.
     let ollama_client = crate::OllamaClient::try_from_oss_provider(config).await?;

@@ -31,6 +31,7 @@ pub mod exec_env;
 pub mod executor;
 mod flags;
 pub mod git_info;
+pub mod gpt_oss;
 pub mod landlock;
 mod mcp_connection_manager;
 mod mcp_tool_call;

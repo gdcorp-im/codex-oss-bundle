@@ -23,8 +23,12 @@ Download the binary for your platform from the [latest release](https://github.c
 - [codex-oss-aarch64-unknown-linux-musl.tar.gz](https://github.com/jgowdy-godaddy/codex/releases/latest) (recommended - static binary)
 - [codex-oss-aarch64-unknown-linux-gnu.tar.gz](https://github.com/jgowdy-godaddy/codex/releases/latest) (glibc)
 
+**Windows x86_64:**
+- [codex-oss-x86_64-pc-windows-msvc.zip](https://github.com/jgowdy-godaddy/codex/releases/latest)
+
 ### 2. Install
 
+**macOS/Linux:**
 ```bash
 # Extract the archive
 tar -xzf codex-oss-*.tar.gz
@@ -32,8 +36,15 @@ tar -xzf codex-oss-*.tar.gz
 # Move to a directory in your PATH
 sudo mv codex-oss-* /usr/local/bin/codex-oss
 
-# Make executable (Linux/macOS)
+# Make executable
 chmod +x /usr/local/bin/codex-oss
+```
+
+**Windows:**
+```powershell
+# Extract the .zip file (right-click → Extract All)
+# Then add the directory to your PATH, or run directly:
+.\codex-oss.exe
 ```
 
 ### 3. Run
@@ -59,7 +70,7 @@ On first run:
 
 - **RAM**: 16GB minimum (20GB recommended)
 - **Disk**: 15GB free space for model storage
-- **OS**: macOS 10.15+, Linux (kernel 3.2+)
+- **OS**: macOS 10.15+, Linux (kernel 3.2+), Windows 10+
 
 ## Usage Examples
 

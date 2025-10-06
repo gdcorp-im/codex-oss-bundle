@@ -48,6 +48,11 @@ jobs:
             target: aarch64-unknown-linux-gnu
             build_universal: false
 
+          # Windows
+          - runner: windows-latest
+            target: x86_64-pc-windows-msvc
+            build_universal: false
+
     steps:
       - uses: actions/checkout@v5
 
@@ -78,7 +83,12 @@ jobs:
         run: |
           dest="dist/${{ matrix.target }}"
           mkdir -p "$dest"
-          cp target/${{ matrix.target }}/release/codex-oss "$dest/codex-oss-${{ matrix.target }}"
+
+          if [[ "${{ matrix.runner }}" == windows* ]]; then
+            cp target/${{ matrix.target }}/release/codex-oss.exe "$dest/codex-oss-${{ matrix.target }}.exe"
+          else
+            cp target/${{ matrix.target }}/release/codex-oss "$dest/codex-oss-${{ matrix.target }}"
+          fi
 
       # Create macOS universal binary (only on aarch64 build)
       - if: ${{ matrix.build_universal }}
@@ -105,9 +115,21 @@ jobs:
         run: |
           # Compress per-target binary
           dest="dist/${{ matrix.target }}"
-          if [[ -f "$dest/codex-oss-${{ matrix.target }}" ]]; then
-            tar -C "$dest" -czf "$dest/codex-oss-${{ matrix.target }}.tar.gz" "codex-oss-${{ matrix.target }}"
-            zstd -T0 -19 --rm "$dest/codex-oss-${{ matrix.target }}"
+
+          if [[ "${{ matrix.runner }}" == windows* ]]; then
+            # Windows: create .zip
+            binary="codex-oss-${{ matrix.target }}.exe"
+            if [[ -f "$dest/$binary" ]]; then
+              (cd "$dest" && 7z a "$binary.zip" "$binary")
+              zstd -T0 -19 --rm "$dest/$binary"
+            fi
+          else
+            # Unix: create .tar.gz and .zst
+            binary="codex-oss-${{ matrix.target }}"
+            if [[ -f "$dest/$binary" ]]; then
+              tar -C "$dest" -czf "$dest/$binary.tar.gz" "$binary"
+              zstd -T0 -19 --rm "$dest/$binary"
+            fi
           fi
 
           # Compress universal binary if it exists
@@ -176,6 +198,9 @@ jobs:
             ### Linux ARM64
             - **glibc** (standard): `codex-oss-aarch64-unknown-linux-gnu.tar.gz`
             - **musl** (static, more portable): `codex-oss-aarch64-unknown-linux-musl.tar.gz`
+
+            ### Windows x86_64
+            - `codex-oss-x86_64-pc-windows-msvc.zip`
 
             ## Usage
 
