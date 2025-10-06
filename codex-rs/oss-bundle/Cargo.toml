@@ -14,7 +14,7 @@ workspace = true
 anyhow = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
 codex-ollama = { workspace = true }
-codex-tui = { workspace = true }
+codex-tui = { workspace = true, features = ["oss-bundle"] }
 ctrlc = "3.4"
 dirs = { workspace = true }
 reqwest = { workspace = true, features = ["json"] }

@@ -16,6 +16,8 @@ path = "src/lib.rs"
 vt100-tests = []
 # Gate verbose debug logging inside the TUI implementation.
 debug-logs = []
+# Disable version update checks for OSS bundle
+oss-bundle = []
 
 [lints]
 workspace = true
