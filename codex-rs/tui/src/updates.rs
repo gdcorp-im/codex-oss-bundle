@@ -14,6 +14,11 @@ use codex_core::default_client::create_client;
 use crate::version::CODEX_CLI_VERSION;
 
 pub fn get_upgrade_version(config: &Config) -> Option<String> {
+    // Skip update check during development (version 0.0.0)
+    if env!("CARGO_PKG_VERSION") == "0.0.0" {
+        return None;
+    }
+
     let version_file = version_filepath(config);
     let info = read_version_info(&version_file).ok();
 

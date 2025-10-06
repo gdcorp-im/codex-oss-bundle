@@ -17,8 +17,12 @@ static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 /// Main entry point for codex-oss standalone binary
 #[tokio::main]
 async fn main() -> Result<()> {
-    // Don't initialize tracing here - the TUI will handle it
-    // Any logs before TUI starts will be suppressed to avoid polluting the terminal
+    // Suppress all logging unless explicitly requested
+    if env::var("RUST_LOG").is_err() {
+        unsafe {
+            env::set_var("RUST_LOG", "error");
+        }
+    }
 
     // Extract embedded Ollama binary
     let ollama_binary = embedded::ensure_ollama_extracted()
@@ -60,10 +64,6 @@ async fn main() -> Result<()> {
     unsafe {
         env::set_var("CODEX_OSS_PORT", ollama_port.to_string());
         env::set_var("CODEX_OSS_BASE_URL", format!("http://127.0.0.1:{}/v1", ollama_port));
-        // Suppress verbose logging unless explicitly requested
-        if env::var("RUST_LOG").is_err() {
-            env::set_var("RUST_LOG", "error");
-        }
     }
 
     // Launch codex CLI with --oss flag and pass through all arguments
