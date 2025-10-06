@@ -60,6 +60,10 @@ async fn main() -> Result<()> {
     unsafe {
         env::set_var("CODEX_OSS_PORT", ollama_port.to_string());
         env::set_var("CODEX_OSS_BASE_URL", format!("http://127.0.0.1:{}/v1", ollama_port));
+        // Suppress verbose logging unless explicitly requested
+        if env::var("RUST_LOG").is_err() {
+            env::set_var("RUST_LOG", "error");
+        }
     }
 
     // Launch codex CLI with --oss flag and pass through all arguments
