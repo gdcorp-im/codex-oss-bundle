@@ -12,7 +12,15 @@ pub use pull::PullProgressReporter;
 pub use pull::TuiProgressReporter;
 
 /// Default OSS model to use when `--oss` is passed without an explicit `-m`.
-pub const DEFAULT_OSS_MODEL: &str = "gpt-oss:20b";
+/// Can be overridden via CODEX_OSS_MODEL environment variable.
+pub const DEFAULT_OSS_MODEL: &str = "qwen2.5-coder:32b";
+
+pub fn get_default_oss_model() -> String {
+    std::env::var("CODEX_OSS_MODEL")
+        .ok()
+        .filter(|v| !v.trim().is_empty())
+        .unwrap_or_else(|| DEFAULT_OSS_MODEL.to_string())
+}
 
 /// Prepare the local OSS environment when `--oss` is selected.
 ///

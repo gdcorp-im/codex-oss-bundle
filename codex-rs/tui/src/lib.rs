@@ -112,12 +112,12 @@ pub async fn run_main(
     };
 
     // When using `--oss`, let the bootstrapper pick the model (defaulting to
-    // gpt-oss:20b) and ensure it is present locally. Also, force the built‑in
+    // qwen2.5-coder:32b) and ensure it is present locally. Also, force the built‑in
     // `oss` model provider.
     let model = if let Some(model) = &cli.model {
         Some(model.clone())
     } else if cli.oss {
-        Some(DEFAULT_OSS_MODEL.to_owned())
+        Some(codex_ollama::get_default_oss_model())
     } else {
         None // No model specified, will use the default.
     };
