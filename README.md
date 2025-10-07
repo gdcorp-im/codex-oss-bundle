@@ -70,8 +70,29 @@ codex-oss
 
 On first run:
 - The embedded Ollama server will start automatically
-- The AI model (~12GB) will download (one-time only)
+- The default AI model will download (one-time only)
 - Once complete, you can start coding!
+
+### Model Selection
+
+By default, codex-oss uses **qwen2.5-coder:32b** (~19GB). You can change the model by setting the `CODEX_OSS_MODEL` environment variable:
+
+```bash
+# Use a smaller, faster model (recommended for most users)
+export CODEX_OSS_MODEL="deepseek-coder-v2:16b"
+codex-oss
+
+# Or use a specific model for one session
+CODEX_OSS_MODEL="qwq:32b" codex-oss
+```
+
+**Recommended models for coding:**
+- `deepseek-coder-v2:16b` - Fast, balanced (9GB) **recommended**
+- `qwen2.5-coder:32b` - Best quality, slower (19GB) **default**
+- `qwq:32b` - Strong reasoning (19GB)
+- `phi-4:14b` - Very fast, smaller (8GB)
+
+You can browse all available models at https://ollama.com/library
 
 ## Features
 
@@ -83,8 +104,8 @@ On first run:
 
 ## System Requirements
 
-- **RAM**: 16GB minimum (20GB recommended)
-- **Disk**: 15GB free space for model storage
+- **RAM**: 16GB minimum (32GB recommended for larger models)
+- **Disk**: 10-20GB free space depending on model
 - **OS**: macOS 10.15+, Linux (kernel 3.2+), Windows 10+
 
 ## Usage Examples
