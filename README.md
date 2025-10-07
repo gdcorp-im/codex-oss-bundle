@@ -75,22 +75,27 @@ On first run:
 
 ### Model Selection
 
-By default, codex-oss uses **qwen2.5-coder:32b** (~19GB). You can change the model by setting the `CODEX_OSS_MODEL` environment variable:
+By default, codex-oss uses **gpt-oss:20b** (~13GB), which has excellent tool-calling behavior for agentic coding tasks. You can change the model by setting the `CODEX_OSS_MODEL` environment variable:
 
 ```bash
-# Use a smaller, faster model (recommended for most users)
-export CODEX_OSS_MODEL="deepseek-coder-v2:16b"
+# Use a different model
+export CODEX_OSS_MODEL="qwen2.5-coder:7b"
 codex-oss
 
 # Or use a specific model for one session
-CODEX_OSS_MODEL="qwq:32b" codex-oss
+CODEX_OSS_MODEL="qwen2.5-coder:7b" codex-oss
 ```
 
-**Recommended models for coding:**
-- `deepseek-coder-v2:16b` - Fast, balanced (9GB) **recommended**
-- `qwen2.5-coder:32b` - Best quality, slower (19GB) **default**
-- `qwq:32b` - Strong reasoning (19GB)
-- `phi-4:14b` - Very fast, smaller (8GB)
+**Recommended models for agentic coding (with tool support):**
+- `gpt-oss:20b` - Best for agentic tasks (13GB) **default & recommended**
+- `qwen2.5-coder:7b` - Smaller, faster, less agentic (4.7GB)
+- `qwen2.5-coder:32b` - Larger, slower, less agentic (19GB)
+
+**Important**: Not all models work well for agentic coding. Models must:
+1. Support tool calling (function calling)
+2. Be trained to use tools proactively for file operations
+
+Models like `deepseek-coder-v2` don't support tool calling and won't work with codex-oss.
 
 You can browse all available models at https://ollama.com/library
 
