@@ -333,7 +333,7 @@ pub fn create_oss_provider_with_base_url(base_url: &str) -> ModelProviderInfo {
         base_url: Some(base_url.into()),
         env_key: None,
         env_key_instructions: None,
-        wire_api: WireApi::Responses,
+        wire_api: WireApi::Chat,
         query_params: None,
         http_headers: None,
         env_http_headers: None,
